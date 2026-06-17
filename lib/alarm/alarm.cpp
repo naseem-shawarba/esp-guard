@@ -146,6 +146,16 @@ namespace alarm_system
     return false; // still armed
   }
 
+  
+  static String formatDuration(unsigned long ms)
+  {
+    if (ms >= 60000UL)
+    {
+      return String(ms / 60000UL) + " min";
+    }
+    return String(ms / 1000UL) + " sec";
+  }
+
   void toggle()
   {
     isAlarmActive = !isAlarmActive;
@@ -156,8 +166,22 @@ namespace alarm_system
 
     if (isAlarmActive)
     {
+
+      unsigned long bufferMs = settings::get().postAlarmActivationDelayMs;
+      String msg = "Alarm activated.";
+      if (bufferMs > 0)
+      {
+        msg += " Arming in " + formatDuration(bufferMs) + ".";
+      }
+
+      
+      msg += digitalRead(doorPin) ? "Door is open" : "Door is closed";
+
+      connectivity::connectWiFi();
+      connectivity::sendMessage(msg);
+
       // Grace period after arming; the door state is reported when it elapses.
-      schedulePhase(Phase::Grace, settings::get().postAlarmActivationDelayMs);
+      schedulePhase(Phase::Grace, bufferMs);
     }
     else
     {
