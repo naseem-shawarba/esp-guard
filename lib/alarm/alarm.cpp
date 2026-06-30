@@ -119,14 +119,17 @@ namespace alarm_system
 
     while (elapsed < windowMs)
     {
-      ledState = !ledState;
-      if (ledState)
+      if (!settings::isStealth())
       {
-        rgb_led::red();
-      }
-      else
-      {
-        rgb_led::off();
+        ledState = !ledState;
+        if (ledState)
+        {
+          rgb_led::red();
+        }
+        else
+        {
+          rgb_led::off();
+        }
       }
 
       if (digitalRead(wakeupGpioToggle) == HIGH)
@@ -142,7 +145,11 @@ namespace alarm_system
       Serial.println(max(0UL, (windowMs - elapsed) / 1000));
     }
 
-    rgb_led::blue();
+    if (!settings::isStealth())
+    {
+      rgb_led::blue();
+    }
+
     return false; // still armed
   }
 
@@ -202,7 +209,10 @@ namespace alarm_system
     alarmTriggerCount += 1;
     connectivity::connectWiFi();
     connectivity::sendMessage("The Door has been opened");
-    buzzer::beep(5000, 2500);
+    if (!settings::isStealth())
+    {
+      buzzer::beep(5000, 2500);
+    }
     schedulePhase(Phase::Cooldown, settings::get().postAlarmTriggerDelayMs);
   }
 

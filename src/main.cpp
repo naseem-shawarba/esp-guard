@@ -24,7 +24,11 @@ void setup()
   web_portal::begin();
 
   // Startup indicator
-  rgb_led::blue();
+
+  if (!settings::isStealth())
+  {
+    rgb_led::blue();
+  }
 
   if (!credentials::isConfigured())
   {

@@ -2,20 +2,11 @@
 
 #include <Arduino.h>
 #include "config.h"
-#include "settings.h"
 
 namespace rgb_led
 {
   void setColor(int red, int green, int blue)
   {
-    if (settings::isStealth())
-    {
-      analogWrite(redPin, 0);
-      analogWrite(greenPin, 0);
-      analogWrite(bluePin, 0);
-      return;
-    }
-
     analogWrite(redPin, red);
     analogWrite(greenPin, green);
     analogWrite(bluePin, blue);
